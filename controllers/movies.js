@@ -1,18 +1,18 @@
 import { Movie } from "../models/Movie.js";
 import { asyncWrapper } from "../middleware/asyncWrapper.js";
+import CustomError from "../errors/CustomError.js";
 
 const getAllMovies = asyncWrapper(async (req, res) => {
   const movies = await Movie.find({});
   res.status(200).json({ movies });
 });
 
-const getMovieById = asyncWrapper(async (req, res) => {
-  const { id: movieID } = req.params;
-  const foundMovie = await Movie.findOne({ _id: movieID });
+const getMovieById = asyncWrapper(async (req, res, next) => {
+  const { id: movieId } = req.params;
+  const foundMovie = await Movie.findOne({ _id: movieId });
   if (!foundMovie)
-    return res
-      .status(404)
-      .json({ error: `Movie with id ${movieID} not found` });
+    return next(new CustomError(`Movie with id ${movieId} not found`, 404));
+
   res.status(200).json({ foundMovie });
 });
 
@@ -28,19 +28,16 @@ const updateMovie = asyncWrapper(async (req, res) => {
     runValidators: true,
   });
   if (!foundMovie)
-    return res
-      .status(404)
-      .json({ error: `Movie with id ${movieId} not found` });
+    return next(new CustomError(`Movie with id ${movieId} not found`, 404));
+
   res.status(200).json({ foundMovie });
 });
 
 const deleteMovie = asyncWrapper(async (req, res) => {
-  const { id: movieID } = req.params;
-  const foundMovie = await Movie.findOneAndDelete({ _id: movieID });
+  const { id: movieId } = req.params;
+  const foundMovie = await Movie.findOneAndDelete({ _id: movieId });
   if (!foundMovie)
-    return res
-      .status(404)
-      .json({ error: `Movie with id ${movieID} not found` });
+    return next(new CustomError(`Movie with id ${movieId} not found`, 404));
   res.status(200).json({ foundMovie });
 });
 
