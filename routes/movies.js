@@ -10,6 +10,6 @@ import {
 const router = express.Router();
 
 router.route("/").get(getAllMovies).post(createMovie);
-router.route("/:id").get(getMovieById).put(updateMovie).delete(deleteMovie);
+router.route("/:id").get(getMovieById).patch(updateMovie).delete(deleteMovie);
 
 export { router as moviesRouter };
